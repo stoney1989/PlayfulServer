@@ -42,11 +42,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-var db = new sqlite3.cached.Database( GLOBAL.db );
+var db = new sqlite3.Database( GLOBAL.db );
 db.serialize(function() {
-  db.run("CREATE TABLE IF NOT EXISTS scene ( id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, email TEXT NOT NULL, name TEXT NOT NULL, nickname TEXT NOT NULL, location TEXT NOT NULL, timestamp TEXT NOT NULL )");
+  db.run("CREATE TABLE IF NOT EXISTS scene ( id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, email TEXT NOT NULL, description TEXT NOT NULL, name TEXT NOT NULL, nickname TEXT NOT NULL, location TEXT NOT NULL, timestamp TEXT NOT NULL, images INT NOT NULL )");
 });
-//db.close();
+db.close();
 
 
 
@@ -68,7 +68,7 @@ db.serialize(function() {
 
 //main
 var main = require('./routes/main');
-app.get('/', main);
+app.get('/content', main);
 
 //upload
 var upload = require('./routes/upload' );

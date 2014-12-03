@@ -41,6 +41,7 @@ $( function(){
 		formData.append("name", "Groucho");
 		formData.append("scene", "GrouchoScene");
 		formData.append("email", "Groucho@asdf.ch");
+		formData.append("description", "asdfasdfasdf");
 		formData.append("file", content);
 		
 		$.ajax({

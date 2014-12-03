@@ -25,8 +25,17 @@ var busconfig = {
 
 
 var formconfig = {
-    file: {
+	images: {
 		multiple: false,
+		buffered: true,
+		maxSize: {
+			size: MAX_SIZE,
+			error: ('file size too large (must be '+MAX_SIZE+' MB or less)')
+		},
+    },
+    playful: {
+		multiple: false,
+		required: true,
 		buffered: true,
 		maxSize: {
 			size: MAX_SIZE,
@@ -45,6 +54,13 @@ var formconfig = {
 		rules: [
                { test: /^.{0,50}$/,
                  error: 'Scenename must be 50 characters or less' }
+             ],
+    },
+	description:{
+		required: true,
+		rules: [
+               { test: /^.{0,300}$/,
+                 error: 'Description must be 300 characters or less' }
              ],
     },
 	email:{
@@ -78,23 +94,20 @@ var process = function(req, res, next) {
     }
     
     //make directory
-	var timestamp = new Date().getTime();
-    var path = './public/content/'+req.form.data.name+'/'+timestamp+'/'+req.form.data.scene+'/';
-   
+	var timestamp = new Date().getTime()+'';
+	var location = 'content/'+req.form.data.name+'/'+timestamp+'/'+req.form.data.scene+'/';
+	var path = './public/'+location;
     mkdirp( path, function (err) {
 		if (err) {
 			console.error(err);
 		}else{
-
-		
-		
-			var zip = new JSZip( req.form.data.file.data );
-			//console.log(zip);
+	
 			
-			//writeFile( path+'test.zip', req.form.data.file.data, req.form.data.file.size );
+			writeFile( path+'playful.playful', req.form.data.playful.data, req.form.data.playful.size );
 			
-			var images = zip.folder("images").file(/.*\.png/);			
-			
+			//extract images
+			var zip = new JSZip( req.form.data.images.data );
+			var images = zip.folder("images").file(/.*\.png/);					
 			
 			for(var i = 0; i < images.length; i++ ){
 				//console.log(images[i].name);
@@ -103,17 +116,17 @@ var process = function(req, res, next) {
 				writeFile( path+'image'+i+'.png', data, data.length );
 			}
 			
-			var db = new sqlite3.cached.Database( GLOBAL.db );
+			var db = new sqlite3.Database( GLOBAL.db );
 			db.serialize(function() {
-				var stmt = db.prepare("INSERT INTO scene ( id, email, name, nickname, location, timestamp ) VALUES (NULL, ?, ?, ?, ?, ?)");
-				stmt.run([ req.form.data.email, req.form.data.scene, req.form.data.name, path, timestamp ]).finalize();
+				var stmt = db.prepare("INSERT INTO scene ( id, email, description, name, nickname, location, timestamp, images ) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)");
+				stmt.run([ req.form.data.email, req.form.data.description, req.form.data.scene, req.form.data.name, location, timestamp, images.length ]).finalize();
 			});
 			db.close();
 			
 		}
     });
 
-    console.log("finished");
+    //console.log("finished");
     res.send(200, 'Thank you for your form submission!');
 
 };
