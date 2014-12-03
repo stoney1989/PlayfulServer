@@ -17,7 +17,7 @@ router.get('/content', function(req, res) {
 			
 				
 			// });
-			//console.log( row.timestamp );
+			//console.log( new Date( scene.timestamp ) );
 			rows.push( row );
 			
 			

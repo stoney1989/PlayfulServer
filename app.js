@@ -8,6 +8,7 @@ var path = require('path');
 var app = express();
 
 GLOBAL.db = './test.db';
+GLOBAL.root = __dirname;
 
 var sqlite3 = require('sqlite3').verbose();
 
@@ -29,6 +30,9 @@ var sqlite3 = require('sqlite3').verbose();
 
 app.engine('.html', require('ejs').__express);
 app.set('views', path.join(__dirname, 'views'));
+
+
+
 app.set('view engine', 'html');
 // app.set('view engine', 'jade');
 
@@ -73,6 +77,9 @@ app.get('/content', main);
 //upload
 var upload = require('./routes/upload' );
 app.all('/upload', upload);
+
+var download = require('./routes/download' );
+app.all('/download', download);
 
 
 

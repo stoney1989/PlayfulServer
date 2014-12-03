@@ -20,7 +20,7 @@
 						<div class="row">
 								<div class="col-md-12 scene-entry">
 									
-									<h3><%= scene.name %></h3>
+									<h3><%= scene.name %>(<%= scene.id %>)</h3>
 									
 									<div class="row">
 										<div class="col-md-6">
@@ -65,7 +65,7 @@
 												<div class="col-md-12">
 													<a type="button" href="/<%= scene.location %>/playful.playful" class="btn btn-primary">Download</a 	>													
 												
-													<a type="button" class="btn btn-primary">Open in PlayfulEditor</a>
+													<a type="button" href="http://localhost/playfulEditor?load_scene=<%= scene.id %>" class="btn btn-primary">Open in PlayfulEditor</a>
 												</div>
 											</div>
 										</div>
