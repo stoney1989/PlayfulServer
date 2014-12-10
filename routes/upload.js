@@ -3,6 +3,8 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var JSZip = require("jszip");
 
+var crypto = require('crypto');
+
 var express = require('express');
 var router = express.Router();
 var busboy = require('connect-busboy');
@@ -58,10 +60,6 @@ var formconfig = {
     },
 	description:{
 		required: true,
-		rules: [
-               { test: /^.{0,300}$/,
-                 error: 'Description must be 300 characters or less' }
-             ],
     },
 	email:{
 		required: true,
@@ -94,9 +92,18 @@ var process = function(req, res, next) {
     }
     
     //make directory
-	var timestamp = new Date().getTime()+'';
-	var location = 'content/'+req.form.data.name+'/'+timestamp+'/'+req.form.data.scene+'/';
+	var timestamp = new Date().toUTCString();
+	var shasum = crypto.createHash('sha256');
+	shasum.update( req.form.data.email + req.form.data.name + timestamp + req.form.data.scene );
+	var locationHash = shasum.digest('hex');
+	var location = 'content/'+locationHash+'/';
 	var path = './public/'+location;
+	
+	shasum = crypto.createHash('sha256');
+	shasum.update( req.form.data.email );
+	req.form.data.email = shasum.digest('hex');
+	
+	
     mkdirp( path, function (err) {
 		if (err) {
 			console.error(err);
