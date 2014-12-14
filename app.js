@@ -72,14 +72,14 @@ db.close();
 
 //main
 var main = require('./routes/main');
-app.get('/content', main);
+app.get('/play/gallery', main);
 
 //upload
 var upload = require('./routes/upload' );
-app.all('/upload', upload);
+app.post('/play/gallery/upload', upload);
 
 var download = require('./routes/download' );
-app.all('/download', download);
+app.get('/play/gallery/download', download);
 
 
 

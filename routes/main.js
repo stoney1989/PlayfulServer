@@ -5,7 +5,7 @@ var glob = require('glob');
 
 var sqlite3 = require('sqlite3').verbose();
 
-router.get('/content', function(req, res) {
+router.get('/play/gallery', function(req, res) {
 	var db = new sqlite3.Database( GLOBAL.db );
 	
 	
@@ -23,7 +23,7 @@ router.get('/content', function(req, res) {
 			
 			//console.log( row.name + ' ,' + row.nickname + ' ,' + row.location);
 		}, function(err, rowcount ){
-			res.render( 'index', { scenes: rows } );		
+			res.render( 'index', { scenes: rows, host: req.headers.host } );		
 		});
 		
 	});		

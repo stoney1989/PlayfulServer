@@ -158,9 +158,7 @@ function writeFile( path, buffer, size ){
     });
 }
 
-router.route('/upload')
-.post( busboy( busconfig ), form( formconfig ), check, process  )
-.get( function(req, res) { res.render('upload/ajaxupload', {} ); } );
+router.route('/play/gallery/upload').post( busboy( busconfig ), form( formconfig ), check, process  );
 
 module.exports = router;
 

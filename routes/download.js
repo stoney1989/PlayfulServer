@@ -6,7 +6,7 @@ var fs = require('fs');
 var path = require('path');
 
 
-router.get('/download', function( req, res ){
+router.get('/play/gallery/download', function( req, res ){
 	console.log("want:"+req.param( 'load_scene' ));
 	if( req.param('load_scene') !== undefined ){
 	
@@ -16,14 +16,6 @@ router.get('/download', function( req, res ){
 				if( err === null ){
 							
 					var file = path.join( GLOBAL.root, '/public/'+row.location + 'playful.playful' );
-					// res.sendFile(file,{},function(err){
-						// if(err){
-							// console.log(err);
-							// res.status(err.status).end();
-						// }else{
-							// console.log("send");
-						// }
-					// });
 					fs.exists( file, function(exists) {
 						if(exists){
 							fs.stat(file, function(err, stats) {
@@ -43,13 +35,6 @@ router.get('/download', function( req, res ){
 							});						
 						}
 					});
-					
-					//var zip = new JSZip( './public/'+row.location+'playful.playful' );
-					//console.log( file );
-					
-					
-					
-					//var zip = new JSZip( file );
 				}
 			});
 		});
