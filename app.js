@@ -1,5 +1,6 @@
 var express = require('express');
 var path = require('path');
+
 //var favicon = require('serve-favicon');
 //var logger = require('morgan');
 //var cookieParser = require('cookie-parser');
@@ -9,6 +10,46 @@ var app = express();
 
 GLOBAL.db = './test.db';
 GLOBAL.root = __dirname;
+
+GLOBAL.checkCaptcha = function( resp_token, user_ip, success, error ){
+	//var PUBLIC_KEY  = '6Ld5j_8SAAAAADdyhgzdoSKe6LRR8c75rW5F9RWr';
+	var secret = '6Ld5j_8SAAAAAO2v2MEpAXoF2B3_IyUNr-cmAZkR';
+	
+	var https = require('https');
+	
+	var url = "https://www.google.com/recaptcha/api/siteverify";
+	url += "?secret="+secret;
+	url += "&response="+resp_token;
+	url += "&remoteip="+user_ip;
+	
+	//console.log(url);
+	
+	https.get(url, function(res){
+		//console.log("statusCode: ", res.statusCode);
+		//console.log("headers: ", res.headers);
+		res.setEncoding('utf8');		
+		
+		res.on('data', function(d) {
+			var data =  JSON.parse(d);			
+			//data.success = data.success || false;
+			//console.log(data);	
+			//console.log(data.success == true);
+			if( data.success === true){
+				//console.log("captcha correct");
+				success(data);
+			}else{
+				data['error-codes'] = 'Captcha: '+data['error-codes'];
+				//console.log("captcha incorrect");
+				error(data);
+			}			
+		});
+		
+	}).on('error', function(){
+		var e = { success: false, 'error-codes': ['Captcha: Connection Error']};
+		error(e);
+	});
+	
+};
 
 var sqlite3 = require('sqlite3').verbose();
 
@@ -54,36 +95,24 @@ db.close();
 
 
 
-// app.get('/', function (req, res) {
-  // res.send('Hello World!');
-// });
-
-
-//routing table (controllers)
-
-//default
-//var routes = require('./routes/index');
-//app.use('/', routes);
-
-//user
-//var user = require('./routes/user');
-//app.get('/user/:id/uploads', user.uploads);
-
-
-//main
+//show newest Scenes
 var main = require('./routes/main');
 app.get('/play/gallery', main);
 
-//upload
+//upload Scenes
 var upload = require('./routes/upload' );
 app.post('/play/gallery/upload', upload);
 
+//download Scenes
 var download = require('./routes/download' );
 app.get('/play/gallery/download', download);
 
-
-
-
+//recaptcha
+// app.get('/play/gallery/captcha', function(req, res){
+	// var recaptcha = new Recaptcha(GLOBAL.PUBLIC_KEY, GLOBAL.PRIVATE_KEY);
+	// //console.log(recaptcha);
+	// res.render( 'captcha', { captcha: recaptcha } ); 
+// });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
