@@ -34,17 +34,20 @@
 									<div class="row">
 										<div class="col-md-4">
 											<% if( scene.images >= 1 ) { %>
-												<img class="img-responsive" src="/<%= scene.location %>image0.png"></img>
+												<img class="img-responsive lazy" data-original="/<%= scene.location %>image0.png"></img>
+												<noscript><img class="img-responsive" src="/<%= scene.location %>image0.png"</noscript>
 											<% } %>											
 										</div>
 										<div class="col-md-4">
 											<% if( scene.images >= 2 ) { %>
-												<img class="img-responsive" src="/<%= scene.location %>image1.png"></img>
+												<img class="img-responsive lazy" data-original="/<%= scene.location %>image1.png"></img>
+												<noscript><img class="img-responsive" src="/<%= scene.location %>image1.png"</noscript>
 											<% } %>
 										</div>
 										<div class="col-md-4">
 											<% if( scene.images >= 3 ) { %>
-												<img class="img-responsive" src="/<%= scene.location %>image2.png"></img>
+												<img class="img-responsive lazy" data-original="/<%= scene.location %>image2.png"></img>
+												<noscript><img class="img-responsive" src="/<%= scene.location %>image2.png"</noscript>
 											<% } %>
 										</div>
 									</div>
@@ -85,6 +88,24 @@
 	
 		<script src='/javascripts/jquery-2.1.1.min.js'></script>
 		<script src='/javascripts/bootstrap.min.js'></script>
+		<script src='/javascripts/jquery.lazyload.min.js'></script>
+		<script type="text/javascript">
+		
+			function loadImages(){
+				
+				$("img.lazy").show().lazyload({
+					effect : "fadeIn"
+				});
+			}
+			
+			parent.iFrameLoadImages = loadImages;  
+		
+			$(function() {
+				loadImages();
+			});
+			
+			
+		</script>
 	</body>
 
 </html>

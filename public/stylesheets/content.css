@@ -24,3 +24,23 @@ h3{
 a.btn{
 	margin-top:10px;
 }
+
+.g-recaptcha{
+	margin-top: 10px;
+	margin-left: -4px;
+}
+.g-recaptcha > div {
+	background-color: #EEE !important;
+}
+
+
+#removeButton{
+	margin: 10px 0 10 -45%;
+	width: 90%;
+	position: relative;
+	left: 50%;
+}
+
+.lazy{
+	display:none;
+}

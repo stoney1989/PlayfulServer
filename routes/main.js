@@ -11,17 +11,8 @@ router.get('/play/gallery', function(req, res) {
 	
 	db.serialize(function() {
 		var rows = [];
-		db.each("SELECT * FROM scene", function(err, row) {
-			
-			// glob('',{},function( err, files ){
-			
-				
-			// });
-			//console.log( new Date( scene.timestamp ) );
-			rows.push( row );
-			
-			
-			//console.log( row.name + ' ,' + row.nickname + ' ,' + row.location);
+		db.each("SELECT * FROM scene ORDER BY id DESC LIMIT 100", function(err, row) {
+			rows.push( row );		
 		}, function(err, rowcount ){
 			res.render( 'index', { scenes: rows, host: req.headers.host } );		
 		});

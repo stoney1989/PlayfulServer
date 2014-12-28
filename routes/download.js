@@ -7,7 +7,7 @@ var path = require('path');
 
 
 router.get('/play/gallery/download', function( req, res ){
-	console.log("want:"+req.param( 'load_scene' ));
+	//console.log("want:"+req.param( 'load_scene' ));
 	if( req.param('load_scene') !== undefined ){
 	
 		var db = new sqlite3.Database( GLOBAL.db );
@@ -44,6 +44,7 @@ router.get('/play/gallery/download', function( req, res ){
 		//var zip = new JSZip(  );
 		//res.send( 200, "load" );
 	}
+	return res.status(404).send('Scene not Found!');	
 	
 });
 

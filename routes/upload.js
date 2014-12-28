@@ -19,8 +19,8 @@ var MAX_SIZE = 8388608;
 
 var busconfig = {
     limits: {
-        fields: 30, // max 10 non-multipart fields
-        parts:  10, // max 10 multipart fields
+        fields: 30, //non-multipart fields
+        parts:  10, //multipart fields
         fileSize: MAX_SIZE // files can be at most MAX_SIZE MB each
     }
 };
@@ -46,15 +46,31 @@ var formconfig = {
     },
     name:{
 		required: true,
+		rules: [
+               { test: /^.{1,50}$/,
+                 error: 'Name must be between 1 and 50 characters' }
+             ]
     },
-	scene:{
+	scenename:{		
 		required: true,
+		rules: [
+               { test: /^.{1,50}$/,
+                 error: 'Scenename  must be between 1 and 50 characters' }
+             ]
     },
 	description:{
 		required: true,
+		rules: [
+               { test: /^[a-zA-Z0-9\s\S.]{0,500}$/,
+                 error: 'Description must be 500 characters or less' }
+             ]
     },
 	email:{
 		required: true,
+		rules: [
+               { test: /^.{1,50}$/,
+                 error: 'Email must be between 1 and 50 characters' }
+             ]
     },
 	captcha:{
 		required: true,
@@ -85,7 +101,11 @@ var check = function(err, req, res, next) {
 
 var process = function(req, res, next) {
 
-
+	if (req.form.error) {
+			console.log('Form error for field "' + req.form.error.key+ '": '+ req.form.error);
+			
+			return res.status(400).send({'error-codes':'Form error for field "'+ req.form.error.key + '": '+ req.form.error});
+	}		
      
 	var resp_token = req.form.data.captcha;
 	var user_ip    = req.connection.remoteAddress;
@@ -93,23 +113,23 @@ var process = function(req, res, next) {
 	//console.log(resp_token);
 	//console.log("ip:"+user_ip);
 	
-	var captchaSuccess = function(s){
-	
-		if (req.form.error) {
-			console.log('Form error for field "' + req.form.error.key+ '": '+ req.form.error);
-			s['error-codes'] = 'Form error for field "'+ req.form.error.key + '": '+ req.form.error;
-			return res.status(400).send(s);
-		}		
+	var captchaSuccess = function(s){	
 		
 		//make directory
 		var timestamp = new Date().toUTCString();
 		var shasum = crypto.createHash('sha256');
-		shasum.update( req.form.data.email + req.form.data.name + timestamp + req.form.data.scene );
+		shasum.update( req.form.data.email + req.form.data.name + timestamp + req.form.data.scenename );
 		var locationHash = shasum.digest('hex');
 		var location = 'content/'+locationHash+'/';
 		var path = './public/'+location;
 		
-		//setup hash
+		//hash remove link
+		shasum = crypto.createHash('sha256');
+		var rndm = crypto.randomBytes(256);
+		shasum.update( locationHash + rndm );
+		var removeHash = shasum.digest('hex');	
+		
+		//hash email
 		shasum = crypto.createHash('sha256');
 		shasum.update( req.form.data.email );
 		req.form.data.email = shasum.digest('hex');		
@@ -134,15 +154,18 @@ var process = function(req, res, next) {
 					writeFile( path+'image'+i+'.png', data, data.length );
 				}
 				
+
+				
 				var db = new sqlite3.Database( GLOBAL.db );
 				db.serialize(function() {
-					var stmt = db.prepare("INSERT INTO scene ( id, email, description, name, nickname, location, timestamp, images ) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)");
-					stmt.run([ req.form.data.email, req.form.data.description, req.form.data.scene, req.form.data.name, location, timestamp, images.length ]).finalize();
+					var stmt = db.prepare("INSERT INTO scene ( id, email, description, name, nickname, location, timestamp, removehash, images ) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)");
+					stmt.run([ req.form.data.email, req.form.data.description, req.form.data.scenename, req.form.data.name, location, timestamp, removeHash, images.length ]).finalize();
 				});
 				db.close();
-				s['link'] = 'http://'+req.headers.host+'/'+location;
+				s['link']   = 'http://'+req.headers.host+'/'+location;
+				s['remove'] = 'http://'+req.headers.host+'/play/gallery/remove?hash='+removeHash;
 				console.log(s);
-				res.status(200).send(s);
+				return res.status(200).send(s);
 			}
 		});	
 	};

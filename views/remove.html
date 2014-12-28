@@ -1,0 +1,130 @@
+<html>
+
+	<head>
+		
+		<link rel="stylesheet" href="/stylesheets/bootstrap.min.css"></link>
+		<link rel="stylesheet" href="/stylesheets/bootstrap-theme.min.css"></link>
+		<link rel="stylesheet" href="/stylesheets/content.css"></link>
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+		
+		
+		
+	</head>
+
+	<body>
+	
+		<div class="container">
+			<div class="row">
+				
+				<div class="col-md-1"></div>
+				<div class="col-md-10 main-row">
+					<div class="row">
+						<div class="col-md-12 scene-entry">
+							<h3><%= scene.name %></h3>
+									
+								<div class="row">
+									<div class="col-md-6">
+										<h4><%= scene.nickname  %></h4>
+									</div>
+									<div class="col-md-6">
+										<p class="text-right"><%= scene.timestamp  %></p>
+									</div>
+								</div>
+									
+								<div class="row">
+									<div class="col-md-4">
+										<% if( scene.images >= 1 ) { %>
+											<img class="img-responsive" src="/<%= scene.location %>image0.png"></img>
+										<% } %>											
+									</div>
+									<div class="col-md-4">
+										<% if( scene.images >= 2 ) { %>
+											<img class="img-responsive" src="/<%= scene.location %>image1.png"></img>
+										<% } %>
+									</div>
+									<div class="col-md-4">
+										<% if( scene.images >= 3 ) { %>
+											<img class="img-responsive" src="/<%= scene.location %>image2.png"></img>
+										<% } %>
+									</div>
+								</div>
+									
+								<div class="row">
+										
+									<div class="col-md-8">
+										<div class="panel panel-default">
+											<div class="panel-body">
+												<%= scene.description  %>
+											</div>
+										</div>
+											
+									</div>
+										
+									<div class="col-md-4">
+										<div class="row">
+											<div class="col-md-12">
+																								
+												<div class="g-recaptcha bg-info" data-sitekey="6Ld5j_8SAAAAADdyhgzdoSKe6LRR8c75rW5F9RWr"></div>
+												<a id="removeButton" type="button" href="" class="btn btn-danger btn-lg">Remove Scene</a 	>	
+											</div>
+										</div>
+									</div>
+										
+										
+								</div>
+									
+							</div>
+					</div>
+					
+				</div>
+				<div class="col-md-1"></div>				
+				
+			</div>
+		</div>
+	
+	
+		<script src='/javascripts/jquery-2.1.1.min.js'></script>
+		<script src='/javascripts/bootstrap.min.js'></script>
+		<script>
+			$(function(){
+				$('#removeButton').click(function(event){
+					event.preventDefault();
+					var formData = new FormData();
+					formData.append( 'captcha', $('#g-recaptcha-response').val() || '' );
+					formData.append( 'hash', '<%= scene.removehash %>' );
+					
+					var success = function(a,b,c){
+						console.log('success');
+						window.location = 'http://<%= host %>/play/gallery';
+					};
+					var error = function(a,b,c){
+						console.log('error');
+						console.log(a);
+						console.log(b);
+						console.log(c);
+					};
+					var complete = function(){
+						console.log('complete');
+						grecaptcha.reset();
+					};
+					
+					console.log('click');
+					
+					$.ajax({
+						url: 'http://<%= host %>/play/gallery/remove',
+						type: 'POST',
+						dataType: 'json',
+						data: formData,
+						crossDomain: true,
+						error: error,
+						success: success,
+						complete: complete,
+						processData: false,  // tell jQuery not to process the data
+						contentType: false   // tell jQuery not to set contentType
+					});
+				});
+			});
+		</script>
+	</body>
+
+</html>

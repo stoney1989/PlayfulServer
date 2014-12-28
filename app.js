@@ -89,7 +89,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var db = new sqlite3.Database( GLOBAL.db );
 db.serialize(function() {
-  db.run("CREATE TABLE IF NOT EXISTS scene ( id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, email TEXT NOT NULL, description TEXT NOT NULL, name TEXT NOT NULL, nickname TEXT NOT NULL, location TEXT NOT NULL, timestamp TEXT NOT NULL, images INT NOT NULL )");
+  db.run("CREATE TABLE IF NOT EXISTS scene ( id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, email TEXT NOT NULL, description TEXT NOT NULL, name TEXT NOT NULL, nickname TEXT NOT NULL, location TEXT NOT NULL, timestamp TEXT NOT NULL, removehash TEXT NOT NULL, images INT NOT NULL )");
 });
 db.close();
 
@@ -107,12 +107,9 @@ app.post('/play/gallery/upload', upload);
 var download = require('./routes/download' );
 app.get('/play/gallery/download', download);
 
-//recaptcha
-// app.get('/play/gallery/captcha', function(req, res){
-	// var recaptcha = new Recaptcha(GLOBAL.PUBLIC_KEY, GLOBAL.PRIVATE_KEY);
-	// //console.log(recaptcha);
-	// res.render( 'captcha', { captcha: recaptcha } ); 
-// });
+//remove Scenes
+var remove = require('./routes/remove');
+app.route('/play/gallery/remove').all(remove);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
