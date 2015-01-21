@@ -11,7 +11,7 @@ router.get('/play/gallery', function(req, res) {
 	
 	db.serialize(function() {
 		var rows = [];
-		db.each("SELECT * FROM scene ORDER BY id DESC LIMIT 100", function(err, row) {
+		db.each("SELECT * FROM scene ORDER BY id DESC LIMIT ?", [ GLOBAL.maxScenesOnFrontPage ], function(err, row) {
 			rows.push( row );		
 		}, function(err, rowcount ){
 			res.render( 'index', { scenes: rows, host: req.headers.host } );		

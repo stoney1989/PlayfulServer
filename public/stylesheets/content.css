@@ -1,9 +1,11 @@
 .main-row{
-	background-color:#000000;
+	background-color:transparent;
 }
 
 body{
 	background-color:#000000;
+	font-size: 14px;
+	font-family: Arial,sans-serif;
 }
 
 .scene-entry{
@@ -43,4 +45,19 @@ a.btn{
 
 .lazy{
 	display:none;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary.focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background-color: #E57245;
+	border-color: #E57245;
+	
+}
+
+.btn-primary {
+    background-image: linear-gradient(to bottom, #E57245 0px, #E57245 100%);
+    background-repeat: repeat-x;
+    border-color: #E57245;
+	font-weight: bold;
+	font-family: Arial,sans-serif;
+	padding: 6px 10px;
 }

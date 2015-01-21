@@ -12,16 +12,18 @@ var form = require('reformed');
 
 var sqlite3 = require('sqlite3').verbose();
 
-var MAX_SIZE = 8388608;
 
+//var MAX_SIZE = 99999999999999;
+//var MAX_SIZE = 8 * 1000 * 1024;
 
 
 
 var busconfig = {
     limits: {
+		immediate: true,
         fields: 30, //non-multipart fields
         parts:  10, //multipart fields
-        fileSize: MAX_SIZE // files can be at most MAX_SIZE MB each
+        //fileSize: MAX_SIZE // files can be at most MAX_SIZE MB each
     }
 };
 
@@ -31,8 +33,8 @@ var formconfig = {
 		multiple: false,
 		buffered: true,
 		maxSize: {
-			size: MAX_SIZE,
-			error: ('file size too large (must be '+MAX_SIZE+' MB or less)'),
+			size: GLOBAL.max_size,
+			error: ('file size too large (must be '+ (GLOBAL.maxSize/1000000) +' MB or less)'),
 		},
     },
     playful: {
@@ -40,8 +42,8 @@ var formconfig = {
 		required: true,
 		buffered: true,
 		maxSize: {
-			size: MAX_SIZE,
-			error: ('file size too large (must be '+MAX_SIZE+' MB or less)')
+			size: GLOBAL.maxSize,
+			error: ('file size too large (must be '+ (GLOBAL.maxSize/1000000) +' MB or less)')
 		},
     },
     name:{
@@ -106,6 +108,12 @@ var process = function(req, res, next) {
 			
 			return res.status(400).send({'error-codes':'Form error for field "'+ req.form.error.key + '": '+ req.form.error});
 	}		
+	
+	console.log(req.form.data.email);
+	console.log(req.form.data.name);
+	console.log(req.form.data.scenename);
+	console.log('captcha:'+req.form.data.captcha);
+	
      
 	var resp_token = req.form.data.captcha;
 	var user_ip    = req.connection.remoteAddress;
@@ -113,7 +121,9 @@ var process = function(req, res, next) {
 	//console.log(resp_token);
 	//console.log("ip:"+user_ip);
 	
-	var captchaSuccess = function(s){	
+	var captchaSuccess = function(){
+
+		var s = {};
 		
 		//make directory
 		var timestamp = new Date().toUTCString();
@@ -141,11 +151,14 @@ var process = function(req, res, next) {
 				return res.status(400).send(s);				
 			}else{
 					
+				//console.log(req.form.data.playful.data);
+				//console.log(req.form.data.playful.size);
 				writeFile( path+'playful.playful', req.form.data.playful.data, req.form.data.playful.size );
 				
 				//extract images
+				//console.log(req.form.data.images.size);
 				var zip = new JSZip( req.form.data.images.data );
-				var images = zip.folder("images").file(/.*\.png/);					
+				var images = zip.folder("images").file(/.*\.png/);				
 				
 				for(var i = 0; i < images.length; i++ ){
 					//console.log(images[i].name);
@@ -165,16 +178,18 @@ var process = function(req, res, next) {
 				s['link']   = 'http://'+req.headers.host+'/'+location;
 				s['remove'] = 'http://'+req.headers.host+'/play/gallery/remove?hash='+removeHash;
 				console.log(s);
-				return res.status(200).send(s);
+				res.status(200).send(s);
 			}
 		});	
 	};
 	
-	
-	
-	GLOBAL.checkCaptcha(resp_token, user_ip,  captchaSuccess, function(s){		
-		return res.status(400).send(s);		
+	GLOBAL.useCaptchaSession( resp_token, captchaSuccess, function(s){
+		res.status(400).send(s);
 	});
+	
+	// GLOBAL.checkCaptcha(resp_token, user_ip,  captchaSuccess, function(s){		
+		// return res.status(400).send(s);		
+	// });
 	 
 	
 
@@ -201,6 +216,7 @@ function writeFile( path, buffer, size, response ){
 }
 
 router.route('/play/gallery/upload').post( busboy( busconfig ), form( formconfig ), check, process  );
+
 
 module.exports = router;
 

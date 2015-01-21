@@ -1,11 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 
 	<head>
-		
+		<link rel="stylesheet" href="/stylesheets/jquery.fancybox.css?v=2.1.5" type="text/css" media="screen" />
 		<link rel="stylesheet" href="/stylesheets/bootstrap.min.css"></link>
 		<link rel="stylesheet" href="/stylesheets/bootstrap-theme.min.css"></link>
 		<link rel="stylesheet" href="/stylesheets/content.css"></link>
-		
+			
 	</head>
 
 	<body>
@@ -34,22 +35,31 @@
 									<div class="row">
 										<div class="col-md-4">
 											<% if( scene.images >= 1 ) { %>
-												<img class="img-responsive lazy" data-original="/<%= scene.location %>image0.png"></img>
+												<a class="fancybox" title="image0.png" rel="group_<%= scene.id %>" href="/<%= scene.location %>image0.png">
+													<img class="img-responsive lazy" data-original="/<%= scene.location %>image0.png"></img>
+												</a>
 												<noscript><img class="img-responsive" src="/<%= scene.location %>image0.png"</noscript>
 											<% } %>											
 										</div>
 										<div class="col-md-4">
 											<% if( scene.images >= 2 ) { %>
-												<img class="img-responsive lazy" data-original="/<%= scene.location %>image1.png"></img>
+												<a class="fancybox" title="image1.png" rel="group_<%= scene.id %>" href="/<%= scene.location %>image1.png">
+													<img class="img-responsive lazy" data-original="/<%= scene.location %>image1.png"></img>
+												</a>
 												<noscript><img class="img-responsive" src="/<%= scene.location %>image1.png"</noscript>
 											<% } %>
 										</div>
 										<div class="col-md-4">
 											<% if( scene.images >= 3 ) { %>
-												<img class="img-responsive lazy" data-original="/<%= scene.location %>image2.png"></img>
+												<a class="fancybox" title="image2.png" rel="group_<%= scene.id %>" href="/<%= scene.location %>image2.png">
+													<img class="img-responsive lazy" data-original="/<%= scene.location %>image2.png"></img>
+												</a>
 												<noscript><img class="img-responsive" src="/<%= scene.location %>image2.png"</noscript>
 											<% } %>
 										</div>
+										<% for( var i = 3; i+1 <= scene.images; i++ ){ %>
+											<a class="fancybox" title="image<%= ( i ) %>.png" rel="group_<%= scene.id %>" href="/<%= scene.location %>image<%= ( i ) %>.png"></a>
+										<% } %>
 									</div>
 									
 									<div class="row">
@@ -86,26 +96,41 @@
 		</div>
 	
 	
-		<script src='/javascripts/jquery-2.1.1.min.js'></script>
-		<script src='/javascripts/bootstrap.min.js'></script>
-		<script src='/javascripts/jquery.lazyload.min.js'></script>
+		<script type="text/javascript" src='/javascripts/jquery-2.1.1.min.js'></script>
+		<script type="text/javascript" src='/javascripts/bootstrap.min.js'></script>
+		<script type="text/javascript" src='/javascripts/jquery.lazyload.min.js'></script>
+		<script type="text/javascript" src="/javascripts/jquery.fancybox.pack.js?v=2.1.5"></script>
 		<script type="text/javascript">
 		
 			function loadImages(){
 				
 				$("img.lazy").show().lazyload({
-					effect : "fadeIn"
+					effect : "fadeIn",
+					threshold : 200
 				});
 			}
 			
+			//add function for iframe parent
 			parent.iFrameLoadImages = loadImages;  
 		
 			$(function() {
 				loadImages();
+				$(".fancybox").fancybox({
+					padding : 0,
+					margin      : [20, 60, 20, 60],
+					helpers : {
+						overlay : {
+							css : {
+								'background' : 'rgba(1, 1, 1, 0.0)'
+							}
+						}
+					},
+				});
 			});
-			
+						
 			
 		</script>
+		
 	</body>
 
 </html>
